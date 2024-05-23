@@ -1,7 +1,6 @@
 package com.wuzhu.ncrash.monitor
 
 import android.os.Bundle
-import android.os.Process
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent

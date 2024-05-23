@@ -11,7 +11,6 @@ object NativeCrashMonitor {
         System.loadLibrary("nativecrash")
     }
 
-
     fun init(callback: NativeCrashListener) {
         if (isInit) {
             return
@@ -21,11 +20,11 @@ object NativeCrashMonitor {
         nativeSetup()
     }
 
-
     @Keep
     @JvmStatic
     private fun getStackInfoByThreadName(threadName: String): String {
-        return "---todo---threadName=$threadName"
+//        return "---todo---threadName=$threadName"
+        return  SystemThreadGroupUtils.getStackInfoByThreadName(threadName)
     }
 
     external fun stringFromJNI(): String
