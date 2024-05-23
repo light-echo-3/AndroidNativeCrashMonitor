@@ -3,7 +3,6 @@ package com.toptop.nativecrash
 import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
-import androidx.annotation.Keep
 
 object SystemThreadGroupUtils {
 

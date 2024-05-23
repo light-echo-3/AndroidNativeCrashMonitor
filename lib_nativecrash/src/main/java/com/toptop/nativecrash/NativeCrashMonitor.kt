@@ -23,7 +23,7 @@ object NativeCrashMonitor {
     @Keep
     @JvmStatic
     private fun getStackInfoByThreadName(threadName: String): String {
-//        return "---todo---threadName=$threadName"
+//        return "---xxx---threadName=$threadName"
         return  SystemThreadGroupUtils.getStackInfoByThreadName(threadName)
     }
 
