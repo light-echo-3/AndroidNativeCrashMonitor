@@ -8,11 +8,11 @@
 #include <string>
 #include <unistd.h>
 #include "../include/crash/CrashAnalyser.h"
+namespace native_crash_monitor {
+
 extern bool installSignalHandlers();
 extern void installAlternateStack();
-// 异常信号量
-const int exceptionSignals[] = {SIGSEGV, SIGABRT, SIGFPE, SIGILL, SIGBUS, SIGTRAP};
-const int exceptionSignalsNumber = sizeof(exceptionSignals)/ sizeof(exceptionSignals[0]);
 
-static struct sigaction oldHandlers[NSIG];
+} // namespace native_crash_monitor
+
 #endif //NDKACTUALCOMBAT_SIGNALHANDLER_H

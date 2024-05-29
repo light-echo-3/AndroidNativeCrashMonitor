@@ -7,6 +7,8 @@
 #include "CrashAnalyser.h"
 #include <jni.h>
 #include "unistd.h"
+namespace native_crash_monitor {
+
 class JNIBridge {
 private:
     JavaVM *javaVm;//全局的jvm
@@ -19,5 +21,6 @@ public:
     void throwException2Java(native_handler_context *handlerContext);
 };
 
+} // namespace native_crash_monitor
 
 #endif //VIDEO_AUDIO_JNIBRIDGE_H

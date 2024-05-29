@@ -8,6 +8,8 @@
 #include <crash/stringprintf.h>
 #include <cinttypes>
 #include "cxxabi.h"
+namespace native_crash_monitor {
+
 JNIBridge::JNIBridge(JavaVM *javaVm, jobject callbackObj, jclass nativeCrashMonitorClass) {
     this->javaVm = javaVm;
     this->callbackObj = callbackObj;
@@ -33,7 +35,8 @@ void JNIBridge::throwException2Java(native_handler_context *handlerContext) {
     const char *javaExceptionStackInfo = env->GetStringUTFChars((jstring) javaStackInfo, JNI_FALSE);
     //获取c++堆栈信息
     int frame_size = handlerContext->frame_size;
-    string result;
+    std::string result;
+    result += "------signal code=" + std::to_string(handlerContext->code) + "\n";
     for (int index = 0; index < frame_size; ++index) {
         uintptr_t pc = handlerContext->frames[index];
         //获取到加载的内存的起始地址
@@ -85,3 +88,4 @@ void JNIBridge::throwException2Java(native_handler_context *handlerContext) {
         LOGE("DetachCurrentThread failed!");
     }
 }
+} // namespace native_crash_monitor

@@ -4,32 +4,35 @@
 
 #ifndef VIDEO_AUDIO_CRASHANALYSER_H
 #define VIDEO_AUDIO_CRASHANALYSER_H
+
 #include <pthread.h>
+#include <signal.h> // 添加对 siginfo_t 的定义
+#include <unistd.h> // 添加对 pid_t 的定义
 #include "log.h"
-#include "threads.h"
-#include <malloc.h>
-using namespace std;
+
 #define BACKTRACE_FRAMES_MAX 32
-typedef struct native_handler_context_struct {
-    int code;
-    siginfo_t *si;
-    void *sc;
-    pid_t pid;
-    pid_t tid;
-    const char *processName;
-    const char *threadName;
-    int frame_size;
-    uintptr_t frames[BACKTRACE_FRAMES_MAX];
-} native_handler_context;
 
-extern void initCondition();
-void *threadCrashMonitor(void *argv);
+namespace native_crash_monitor {
 
-extern void waitForSignal();
+    typedef struct native_handler_context_struct {
+        int code;
+        siginfo_t *si;
+        void *sc;
+        pid_t pid;
+        pid_t tid;
+        const char *processName;
+        const char *threadName;
+        int frame_size;
+        uintptr_t frames[BACKTRACE_FRAMES_MAX];
+    } native_handler_context;
 
-extern void analysisNativeException();
+    void initCondition();
+    void *threadCrashMonitor(void *argv);
+    void waitForSignal();
+    void analysisNativeException();
+    void notifyCaughtSignal(int code, siginfo_t *si, void *sc);
+    void copyInfo2Context(int code, siginfo_t *si, void *sc);
 
-extern void notifyCaughtSignal(int code, siginfo_t *si, void *sc);
+} // namespace native_crash_monitor
 
-extern void copyInfo2Context(int code, siginfo_t *si, void *sc);
-#endif //VIDEO_AUDIO_CRASHANALYSER_H
+#endif // VIDEO_AUDIO_CRASHANALYSER_H

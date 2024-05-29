@@ -2,6 +2,20 @@
 // Created by peakmain on 2021/8/21.
 //
 #include "../include/crash/SignalHandler.h"
+
+namespace native_crash_monitor {
+
+// 异常信号
+const int exceptionSignals[] = {SIGSEGV, SIGABRT, SIGFPE, SIGILL, SIGBUS, SIGTRAP, SIGSTKFLT};
+//const int exceptionSignals[] = {
+//        1, 2, 3, 4, 5, 6,7,8,10,
+//        11, 12, 13, 14, 15, 16,18,20,//,17(子进程退出)
+//        21, 22, 23,  25, 26,27,28,29,31//30(关机-默认忽略),24(进程的CPU时间片到期)
+//                                };
+const int exceptionSignalsNumber = sizeof(exceptionSignals)/ sizeof(exceptionSignals[0]);
+
+static struct sigaction oldHandlers[NSIG];
+
 //额外的栈空间
 void installAlternateStack() {
     stack_t newStack;
@@ -19,8 +33,36 @@ void installAlternateStack() {
         }
     }
 }
+
+
+/**
+ * debug环境可以work，release不行
+ * @param uc
+ */
+void customHandleSignal(ucontext_t *uc){
+    LOGE("Entering custom signal handler");
+
+#if defined(__arm__)
+    LOGE("Handling ARMv7 architecture");
+    uintptr_t pc = uc->uc_mcontext.arm_pc;
+    LOGE("Current PC: %p", (void*)pc);
+    uc->uc_mcontext.arm_pc += 4; // 跳过当前指令（假设指令为 4 字节）
+    LOGE("New PC: %p", (void*)(uc->uc_mcontext.arm_pc));
+#elif defined(__aarch64__)
+    LOGE("Handling AArch64 architecture");
+    uintptr_t pc = uc->uc_mcontext.pc;
+    LOGE("Current PC: %p", (void*)pc);
+    uc->uc_mcontext.pc += 4; // 跳过当前指令（假设指令为 4 字节）
+    LOGE("New PC: %p", (void*)(uc->uc_mcontext.pc));
+#else
+#error Unsupported architecture
+#endif
+
+    LOGE("Exiting custom signal handler");
+}
+
 void signalPass(int code, siginfo_t *si, void *sc) {
-    LOGE("监听到了native异常");
+    LOGE("监听到了native异常，code=%d",code);
     // 这里要考虑非信号方式防止死锁
     signal(code, SIG_DFL);
     signal(SIGALRM, SIG_DFL);
@@ -29,6 +71,9 @@ void signalPass(int code, siginfo_t *si, void *sc) {
     notifyCaughtSignal(code, si, sc);
     // 给系统原来默认的处理，否则就会进入死循环
     oldHandlers[code].sa_sigaction(code, si, sc);
+
+//    customHandleSignal((ucontext_t *)sc);
+
 }
 
 /**
@@ -37,7 +82,7 @@ void signalPass(int code, siginfo_t *si, void *sc) {
 bool installSignalHandlers() {
     //保存原来的信号处理
     for (int i = 0; i < exceptionSignalsNumber; i++) {
-        // signum：代表信号编码，可以是除SIGKILL及SIGSTOP外的任何一个特定有效的信号，如果为这两个信号定义自己的处理函数，将导致信号安装错误。
+        // signum：代表信号编码，可以是除 SIGKILL 及 SIGSTOP 外的任何一个特定有效的信号，如果为这两个信号定义自己的处理函数，将导致信号安装错误。
         // act：指向结构体sigaction的一个实例的指针，该实例指定了对特定信号的处理，如果设置为空，进程会执行默认处理。
         // oldact：和参数act类似，只不过保存的是原来对相应信号的处理，也可设置为NULL。
         // int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact));
@@ -64,3 +109,4 @@ bool installSignalHandlers() {
     }
     return true;
 }
+} // namespace native_crash_monitor

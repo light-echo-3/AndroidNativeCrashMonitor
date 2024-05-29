@@ -6,7 +6,7 @@
 #include "../../include/crash/CrashAnalyser.h"
 #include "../../include/crash/JNIBridge.h"
 #include <unwind.h>
-
+namespace native_crash_monitor {
 //锁的条件变量
 pthread_cond_t signalCond;
 pthread_mutex_t signalLock;
@@ -97,3 +97,4 @@ void analysisNativeException() {
     LOGD("pid -> %d", handlerContext->pid);
     LOGD("tid -> %d", handlerContext->tid);
 }
+} // namespace native_crash_monitor
