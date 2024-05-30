@@ -4,6 +4,7 @@
 
 #include "../../include/crash/Utils.h"
 #include "log.h"
+namespace native_crash_monitor {
 
 const char *desc_sig(int sig, int code) {
     switch (sig) {
@@ -238,3 +239,5 @@ bool is_dll(const char *name) {
     }
     return 0;
 }
+
+} // namespace native_crash_monitor
