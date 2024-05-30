@@ -9,6 +9,7 @@
 #include <signal.h> // 添加对 siginfo_t 的定义
 #include <unistd.h> // 添加对 pid_t 的定义
 #include "log.h"
+#include <string>
 
 #define BACKTRACE_FRAMES_MAX 32
 
@@ -22,6 +23,7 @@ namespace native_crash_monitor {
         pid_t tid;
         const char *processName;
         const char *threadName;
+        std::string javaThreadName;
         int frame_size;
         uintptr_t frames[BACKTRACE_FRAMES_MAX];
     } native_handler_context;

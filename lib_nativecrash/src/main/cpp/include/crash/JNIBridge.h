@@ -6,6 +6,7 @@
 #define VIDEO_AUDIO_JNIBRIDGE_H
 #include "CrashAnalyser.h"
 #include <jni.h>
+#include <string>
 #include "unistd.h"
 namespace native_crash_monitor {
 
@@ -19,6 +20,7 @@ public:
     JNIBridge(JavaVM *javaVm, jobject callbackObj, jclass nativeCrashMonitorClass);
 public:
     void throwException2Java(native_handler_context *handlerContext);
+    std::string getCurrentJavaThreadName();
 };
 
 } // namespace native_crash_monitor

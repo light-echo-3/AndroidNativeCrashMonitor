@@ -13,6 +13,7 @@ pthread_mutex_t signalLock;
 pthread_cond_t exceptionCond;
 pthread_mutex_t exceptionLock;
 native_handler_context *handlerContext;
+JNIBridge *jniBridgeGlobal;
 
 _Unwind_Reason_Code unwind_callback(struct _Unwind_Context *context, void *arg) {
     native_handler_context *const s = static_cast<native_handler_context *const>(arg);
@@ -79,9 +80,12 @@ void copyInfo2Context(int code, siginfo_t *si, void *sc) {
     handlerContext->processName = getProcessName(handlerContext->pid);
     if (handlerContext->pid == handlerContext->tid) {
         handlerContext->threadName = "main";
+        handlerContext->javaThreadName = "main";
     } else {
         handlerContext->threadName = getThreadName(handlerContext->tid);
+        handlerContext->javaThreadName = jniBridgeGlobal->getCurrentJavaThreadName();
     }
+    LOGE("copyInfo2Context---javaThreadName=%s" , handlerContext->javaThreadName.c_str());
     handlerContext->frame_size = 0;
     //捕获c/c++的堆栈信息
     _Unwind_Backtrace(unwind_callback, handlerContext);

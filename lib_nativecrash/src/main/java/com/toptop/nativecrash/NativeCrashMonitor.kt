@@ -22,8 +22,21 @@ object NativeCrashMonitor {
 
     @Keep
     @JvmStatic
-    private fun getStackInfoByThreadName(threadName: String): String {
-        return  SystemThreadGroupUtils.getStackInfoByThreadName(threadName)
+    private fun getStackInfoByThreadName(threadName: String?, javaThreadName: String?): String {
+        javaThreadName?.takeIf {
+            it.isNotBlank()
+        } ?: threadName?.takeIf {
+            it.isNotBlank()
+        }?.let {
+            return SystemThreadGroupUtils.getStackInfoByThreadName(it)
+        }
+        return ""
+    }
+
+    @Keep
+    @JvmStatic
+    private fun getCurrentJavaThreadName(): String {
+        return  Thread.currentThread().name
     }
 
     external fun stringFromJNI(): String

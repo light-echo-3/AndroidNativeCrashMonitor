@@ -2,6 +2,12 @@
 #include <string>
 #include "native-lib.h"
 
+//extern native_crash_monitor::JNIBridge *jniBridgeee;
+
+namespace native_crash_monitor {
+    extern JNIBridge *jniBridgeGlobal;
+}
+
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_toptop_nativecrash_NativeCrashMonitor_stringFromJNI(
         JNIEnv* env,
@@ -28,6 +34,7 @@ Java_com_toptop_nativecrash_NativeCrashMonitor_nativeCrashInit(JNIEnv *env, jobj
     jclass nativeCrashMonitorClass = env->GetObjectClass(nativeCrashMonitor);
     nativeCrashMonitorClass = (jclass) env->NewGlobalRef(nativeCrashMonitorClass);
     auto *jniBridge = new native_crash_monitor::JNIBridge(javaVm, callback, nativeCrashMonitorClass);
+    native_crash_monitor::jniBridgeGlobal = jniBridge;
     pthread_t pthread;
     //创建一个线程
     native_crash_monitor::initCondition();
